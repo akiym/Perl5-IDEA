@@ -73,6 +73,18 @@ public class PerlArgsExtractionTest extends PerlLightTestCase {
     doTest("unpack_multi_shifts", "($var, undef, $othervar)");
   }
 
+  public void testUnpackSmartArgs() {
+    doTest("unpack_smart_args", "($var, $othervar)");
+  }
+
+  public void testUnpackSmartArgsNoType() {
+    doTest("unpack_smart_args_no_type", "($var, $othervar)");
+  }
+
+  public void testUnpackSmartArgsPos() {
+    doTest("unpack_smart_args_pos", "($var, $othervar)");
+  }
+
 
   protected void doTest(String fileName, String argsString) {
     initWithFileSmart(fileName);

@@ -1,0 +1,9 @@
+use Smart::Args;
+
+sub te<caret>st8
+{
+    args my $class,
+         my $var      => 'Int',
+         my $othervar => { isa => 'Str' },
+         ;
+}

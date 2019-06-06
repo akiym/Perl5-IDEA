@@ -1,0 +1,8 @@
+use Smart::Args;
+
+sub te<caret>st10
+{
+    args_pos my $var      => 'Int',
+             my $othervar => 'Str',
+             ;
+}

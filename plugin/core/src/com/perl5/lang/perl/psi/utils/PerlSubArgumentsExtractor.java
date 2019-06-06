@@ -22,6 +22,7 @@ import com.intellij.util.Processor;
 import com.perl5.lang.perl.idea.PerlElementPatterns;
 import com.perl5.lang.perl.psi.*;
 import com.perl5.lang.perl.psi.impl.PsiPerlCallArgumentsImpl;
+import com.perl5.lang.perl.psi.mixins.PerlCallArguments;
 import com.perl5.lang.perl.util.PerlArrayUtil;
 
 import java.util.ArrayList;
@@ -125,6 +126,63 @@ public class PerlSubArgumentsExtractor implements Processor<PsiPerlStatement>, P
 
       return processNextStatement;
     }
+    else if (SMART_ARGS_PATTERN.accepts(statement)) {
+      PsiPerlSubCallExpr subCallExpr = PsiTreeUtil.getChildOfType(statement, PsiPerlSubCallExpr.class);
+
+      if (subCallExpr == null) {
+        return false;
+      }
+
+      PsiPerlMethod method = PsiTreeUtil.findChildOfType(subCallExpr, PsiPerlMethod.class);
+
+      if (method == null) {
+        return false;
+      }
+
+      String methodName = method.getText();
+      if (methodName.equals("args")) {
+      }
+      else if (methodName.equals("args_pos")) {
+      }
+
+      PerlCallArguments callArguments = PsiTreeUtil.findChildOfType(subCallExpr, PerlCallArguments.class);
+
+      if (callArguments == null) {
+        return false;
+      }
+
+      for (PsiElement element : callArguments.getArgumentsList()) {
+        PerlSubArgument newArgument = null;
+
+        if (element instanceof PsiPerlVariableDeclarationLexical) {
+          List<PsiPerlVariableDeclarationElement> variableList = ((PsiPerlVariableDeclarationLexical)element).getVariableDeclarationElementList();
+          if (!variableList.isEmpty()) {
+            PerlVariable variable = variableList.get(0).getVariable();
+            String variableName = variable.getName();
+            // instance/class method call
+            //   args my $self, my $a => 'Int';
+            //   args my $class, my $a => 'Int';
+            if (variableName.equals("self") || variableName.equals("class")) {
+              newArgument = PerlSubArgument.self();
+            }
+            else {
+              newArgument = PerlSubArgument.mandatory(
+                variable.getActualType(),
+                variable.getName()
+              );
+            }
+            myArguments.add(newArgument);
+          }
+        }
+        // args my $a => 'Int', my $b => 'Str';
+        else if (element instanceof PsiPerlStringSq) {
+        }
+        // args my $a => { isa => 'Int' };
+        else if (element instanceof PsiPerlAnonHash) {
+        }
+      }
+    }
+
     return false;
   }
 

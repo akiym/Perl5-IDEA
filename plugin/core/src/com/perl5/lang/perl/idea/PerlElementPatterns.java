@@ -18,10 +18,13 @@ package com.perl5.lang.perl.idea;
 
 import com.intellij.patterns.PsiElementPattern;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethodCallExpression;
 import com.perl5.lang.perl.lexer.PerlElementTypes;
 import com.perl5.lang.perl.psi.*;
 import com.perl5.lang.perl.psi.impl.PerlNoStatementElement;
 import com.perl5.lang.perl.psi.impl.PerlUseStatementElement;
+import com.perl5.lang.perl.psi.impl.PsiPerlMethodImpl;
+import com.perl5.lang.perl.psi.mixins.PerlCallArguments;
 
 import static com.intellij.patterns.PlatformPatterns.psiElement;
 
@@ -229,6 +232,16 @@ public interface PerlElementPatterns extends PerlElementTypes {
                                                         psiElement().withLastChild(TAILING_SHIFT_PATTERN),
 							psiElement().withLastChild(ALL_ARGUMENTS_PATTERN)
 					)*/
+    );
+
+  PsiElementPattern.Capture<PsiPerlStatement> SMART_ARGS_PATTERN =
+    psiElement(PsiPerlStatement.class).withFirstChild(
+      psiElement(PsiPerlSubCallExpr.class).withFirstChild(
+        psiElement(PsiPerlMethod.class).andOr(
+          psiElement().withText("args"),
+          psiElement().withText("args_pos")
+        )
+      )
     );
 
   PsiElementPattern.Capture<PsiPerlStatement> ARGUMENTS_LAST_UNPACKING_PATTERN =

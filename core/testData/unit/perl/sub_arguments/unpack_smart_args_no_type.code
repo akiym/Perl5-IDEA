@@ -1,0 +1,6 @@
+use Smart::Args;
+
+sub te<caret>st9
+{
+    args my $self, my $var, my $othervar;
+}
